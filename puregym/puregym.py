@@ -1,45 +1,57 @@
-from urllib.request import urlopen
+from enum import Enum
+from collections import namedtuple
 
-import esprima
-import lxml.html
+from cached_property import cached_property
 
-from .gym import Gym
+from .scraper import AllGymsScaper
+
+
+class GymStatus(Enum):
+    coming_soon = 1
+    ready = 2
+    opening_soon = 4
+
+
+GymLocation = namedtuple('GymLocation',
+                         ['latitude', 'longitude', 'address', 'postcode'])
+
+GymPrice = namedtuple('GymPrice',
+                      ['per_month', 'joining_fee', 'pay_as_you_go'])
+
+Gym = namedtuple('Gym',
+                 ['id', 'url', 'slug', 'name', 'location', 'price', 'status'])
+
 
 class PureGym:
 
-    def __init__(self):
-        pass
-
-    @property
+    @cached_property
     def gyms(self):
-        gyms = []
+        scraper = AllGymsScaper()
+        return [
+            self.parse_gym_data(gym_data)
+            for gym_data in scraper.data
+        ]
 
-        for gym in self.find_gyms():
-            gyms.append(Gym(gym['id']))
+    def parse_gym_data(self, gym_data):
+        location = GymLocation(
+            latitude=gym_data['latitude'],
+            longitude=gym_data['longitude'],
+            address=gym_data['streetAddress'],
+            postcode=gym_data['postcode'],
+        )
 
-        return gyms
+        price = GymPrice(
+            per_month=gym_data['monthlyfee'],
+            joining_fee=gym_data['joiningfee'],
+            pay_as_you_go=gym_data['payAsYouGoFee'],
+        )
 
-    def find_gyms(self):
-        url = 'https://www.puregym.com/gyms/'
-        doc = lxml.html.parse(urlopen(url))
-        script = doc.getroot().cssselect('script')[-1]
-
-        tree = esprima.parseScript(script.text)
-        dom_content_loaded = tree.body[0].expression.arguments[1]
-        gym_list_object = dom_content_loaded.body.body[2].expression.arguments[0].arguments[1]
-
-        return self.esprima_to_python(gym_list_object)['allGyms']
-
-    def esprima_to_python(self, obj):
-        if obj.type == 'ObjectExpression':
-            d = {}
-            for p in obj.properties:
-                d[p.key.value] = self.esprima_to_python(p.value)
-            return d
-        elif obj.type == 'ArrayExpression':
-            d = []
-            for p in obj.elements:
-                d.append(self.esprima_to_python(p))
-            return d
-        elif obj.type == 'Literal':
-            return obj.value
+        return Gym(
+            id=gym_data['id'],
+            url='https://www.puregym.com{0}'.format(gym_data['url']),
+            slug=gym_data['urlName'],
+            name=gym_data['name'],
+            location=location,
+            price=price,
+            status=GymStatus(gym_data['status']),
+        )

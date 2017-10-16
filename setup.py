@@ -17,6 +17,8 @@ setup(
         'requests',
         'lxml',
         'cssselect',
+        'esprima',
+        'cached-property',
     ],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
