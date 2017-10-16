@@ -7,6 +7,10 @@ from .scraper import AllGymsScaper
 
 
 class GymStatus(Enum):
+    """
+    Gyms at PureGym can have a status of coming soon, opening soon or ready.
+    """
+
     coming_soon = 1
     ready = 2
     opening_soon = 4
@@ -24,15 +28,19 @@ Gym = namedtuple('Gym',
 
 class PureGym:
 
+    """The main class for interacting with the PureGym services."""
+
     @cached_property
     def gyms(self):
+        """Find all the gyms."""
+
         scraper = AllGymsScaper()
         return [
-            self.parse_gym_data(gym_data)
+            self._parse_gym_data(gym_data)
             for gym_data in scraper.data
         ]
 
-    def parse_gym_data(self, gym_data):
+    def _parse_gym_data(self, gym_data):
         location = GymLocation(
             latitude=gym_data['latitude'],
             longitude=gym_data['longitude'],

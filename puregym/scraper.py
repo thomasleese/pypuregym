@@ -6,6 +6,10 @@ import lxml.html
 
 class AllGymsScaper:
 
+    """
+    A website scraper which parses the "Find your gym" page on `puregym.com`.
+    """
+
     url = 'https://www.puregym.com/gyms/'
 
     def __init__(self):
