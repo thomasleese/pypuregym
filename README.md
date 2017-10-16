@@ -1,2 +1,3 @@
-# pypuregym
-Python library for interacting with PureGym.
+# PyPureGym
+
+Python module for interacting with PureGym.
