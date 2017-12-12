@@ -56,4 +56,8 @@ class MyGymScaper:
 
         number_of_people = driver.find_element_by_css_selector('.page__content .equal-height__cell .heading--level3')
 
-        self.number_of_people = int(number_of_people.text.split(' ')[0])
+        number_of_people_str = number_of_people.text
+        if number_of_people_str.startswith('Fewer than'):
+            self.number_of_people = int(number_of_people_str.split(' ')[2]) - 1
+        else:
+            self.number_of_people = int(number_of_people_str.split(' ')[0])
