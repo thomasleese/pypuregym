@@ -19,6 +19,7 @@ setup(
         'cssselect',
         'esprima',
         'cached-property',
+        'selenium',
     ],
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],

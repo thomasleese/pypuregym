@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from cached_property import cached_property
 
-from .scraper import AllGymsScaper
+from .scraper import AllGymsScaper, MyGymScaper
 
 
 class GymStatus(Enum):
@@ -25,10 +25,21 @@ GymPrice = namedtuple('GymPrice',
 Gym = namedtuple('Gym',
                  ['id', 'url', 'slug', 'name', 'location', 'price', 'status'])
 
+MyGym = namedtuple('MyGym', ['number_of_people'])
+
 
 class PureGym:
 
     """The main class for interacting with the PureGym services."""
+
+    def __init__(self, email_address=None, pin=None):
+        self.email_address = email_address
+        self.pin = pin
+
+    @cached_property
+    def my_gym(self):
+        scraper = MyGymScaper(self.email_address, self.pin)
+        return MyGym(number_of_people=scraper.number_of_people)
 
     @cached_property
     def gyms(self):

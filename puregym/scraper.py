@@ -2,6 +2,7 @@ from urllib.request import urlopen
 
 import esprima
 import lxml.html
+import selenium.webdriver
 
 
 class AllGymsScaper:
@@ -41,3 +42,18 @@ class AllGymsScaper:
             return -self.esprima_to_python(node.argument)
         else:
             raise ValueError('Unknown node: {}'.format(obj))
+
+
+class MyGymScaper:
+
+    def __init__(self, email_address, pin):
+        driver = selenium.webdriver.PhantomJS()
+        driver.implicitly_wait(10)
+        driver.get('https://www.puregym.com/Login/')
+        driver.find_element_by_id('email').send_keys(email_address)
+        driver.find_element_by_id('pin').send_keys(pin)
+        driver.find_element_by_id('login-submit').click()
+
+        number_of_people = driver.find_element_by_css_selector('.page__content .equal-height__cell .heading--level3')
+
+        self.number_of_people = int(number_of_people.text.split(' ')[0])
