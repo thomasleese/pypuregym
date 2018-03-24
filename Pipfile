@@ -1,7 +1,9 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
+
 
 [packages]
 
@@ -10,7 +12,9 @@ requests = "*"
 lxml = "*"
 cssselect = "*"
 esprima = "*"
-"cached-property" = "*"
+cached-property = "*"
 
 
 [dev-packages]
+
+twine = "*"
